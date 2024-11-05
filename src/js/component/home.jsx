@@ -37,6 +37,7 @@ return(
 		
 		<div className="container mt-3">
 
+		<form>
 			<input
 				className="form-control"
 				placeholder="Add new task"
@@ -47,9 +48,8 @@ return(
 					if (e.key === "Enter") { addTask(inputValue) }
 				} 
 			} />
-
+		</form>
 	
-
 		<ul className="list-group">
 			{task.map((tasks, index) => (
 				<li className="list-group-item d-flex justify-content-between align-items-center" key={index}>{tasks}<button className="btn btn-light" onClick={() => deleteTask(index)}>x</button></li>
