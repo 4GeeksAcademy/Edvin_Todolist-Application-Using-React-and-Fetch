@@ -8,8 +8,6 @@ const Home = () => {
 
 	const [inputValue, setInputValue] = useState('');
 	const [task, setTask] = useState([]);
-
-	console.log(task);
 	
 	/// nueva parte de 
 	
@@ -40,14 +38,9 @@ const Home = () => {
 
 
 	const recibirTarea = async() => {
-		const options = {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-		};
+		
 		try{
-			const resp = await fetch('https://playground.4geeks.com/todo/users/edvin', options)
+			const resp = await fetch('https://playground.4geeks.com/todo/users/edvin')
 			if(!resp.ok) {
 				throw new Error('error', Error)
 			}
@@ -80,8 +73,7 @@ const Home = () => {
 			if(!resp.ok) {
 				throw new Error('error deleting', Error)
 			} 
-			setTask(actualizarTarea)
-			console.log(setTask)
+			recibirTarea();
 		}catch (error) {
 			console.error('error deleting');
 		}
@@ -145,14 +137,14 @@ return(
 	
 
 		<ul className="list-group">
-			{task.map((tasks, id) => (
+			{task.filter(el => !el.is_done).map((tasks, id) => (
 				<li className="list-group-item d-flex justify-content-between align-items-center" key={id}>{tasks.label}
-				<button className="btn btn-light" onClick={() => eliminarTarea(task.id)}>x</button></li>
+				<button className="btn btn-light" onClick={() => eliminarTarea(tasks.id)}>x</button></li>
 			) )}
 		</ul>
 
 		<p className="mt-3">
-					{task.length} {task.length === 1 ? "task" : "tasks"} in the list
+					{task.filter(el => !el.is_done).length} {task.length === 1 ? "task" : "tasks"} in the list
 				</p> 
 
 		</div>
