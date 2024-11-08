@@ -9,10 +9,13 @@ const Home = () => {
 	const [inputValue, setInputValue] = useState('');
 	const [task, setTask] = useState([]);
 
+	console.log(task);
+	
 	/// nueva parte de 
 	
 	useEffect(()=>{
-		crearUsuario()
+		recibirTarea();
+		crearUsuario();
 	},[])
 
 	const crearUsuario = async() => {
@@ -48,7 +51,7 @@ const Home = () => {
 			if(!resp.ok) {
 				throw new Error('error', Error)
 			}
-				const data = resp.json();
+				const data = await resp.json();
 				console.log(data);
 				setTask(data.todos);
 				console.log(setTask);
@@ -57,47 +60,32 @@ const Home = () => {
 			}
 	}
 
-	const manejarUpdate = async() => {
+
+
+	const eliminarTarea = async (id) => {
+		console.log('id recibido', id);
+		
+		const actualizarTarea = {label: 'tarea eliminada',
+			is_done: true
+		}
 		const options = {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify()
+			body: JSON.stringify(actualizarTarea)
 		};
 		try{
-			const resp = await fetch('https://playground.4geeks.com/todo/todos/195', options)
-			if(!resp.ok) {
-				throw new Error('error', Error)
-			}
-			const data = resp.json();
-			console.log(data);
-		}catch (error){
-			console.error('error updating');
-			
-		}
-	}
-
-	const eliminarTarea = async () => {
-		const options = {
-			method: 'DELETE',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		};
-		try{
-			const resp = await fetch('https://playground.4geeks.com/todo/users/edvin', options)
+			const resp = await fetch(`https://playground.4geeks.com/todo/todos/${id}`, options)
 			if(!resp.ok) {
 				throw new Error('error deleting', Error)
-			}
+			} 
+			setTask(actualizarTarea)
+			console.log(setTask)
 		}catch (error) {
 			console.error('error deleting');
 		}
 	}
-
-	useEffect(()=> {
-		recibirTarea();
-	})
 
  /// hasta aqui 
 	const handleChange = (e) => {
@@ -105,20 +93,36 @@ const Home = () => {
 		setInputValue(e.target.value);
 	}
 
-	const addTask = (tasks) => {
-		console.log("Tareas recibidas: ", tasks);
-		
-		if (tasks.trim() !== "") {
-			setTask([...task, tasks]);
-			console.log("lista de tareas", [...task, tasks]);
-			
-			setInputValue("")
+	const addTask = (event) => {
+		console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', event)
+		const newTask = {
+			label: event,
+			is_done: false
 		}
+		
+		// let addNewTask = [...task, newTask];
+		// console.log('listaDeTareasActualicada', addNewTask)
 
-	}
-
-		const deleteTask = (indexToDelete) => {
-			setTask(task.filter((_, index) => index !== indexToDelete));
+		
+			const options = {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(newTask)
+			}; 
+			
+			fetch('https://playground.4geeks.com/todo/todos/edvin', options)
+			.then(resp => {
+				console.log('respuesta del servidor', resp);	
+				return resp.json();			
+			}) 
+			.then(()=>{
+				setInputValue('');
+				recibirTarea();
+			})
+			.catch(error => console.error(error)) 			
+			
 		}
 
 return(
@@ -141,8 +145,9 @@ return(
 	
 
 		<ul className="list-group">
-			{task.map((tasks, index) => (
-				<li className="list-group-item d-flex justify-content-between align-items-center" key={index}>{tasks.label}<button className="btn btn-light" onClick={() => deleteTask(index)}>x</button></li>
+			{task.map((tasks, id) => (
+				<li className="list-group-item d-flex justify-content-between align-items-center" key={id}>{tasks.label}
+				<button className="btn btn-light" onClick={() => eliminarTarea(task.id)}>x</button></li>
 			) )}
 		</ul>
 
